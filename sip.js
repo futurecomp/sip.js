@@ -784,9 +784,9 @@ function makeUdpTransport(options, callback) {
 
   function open(remote, error) {
     return {
-      send: function(m) {
+      send: function(m, callback) {
         var s = stringify(m);
-        socket.send(new Buffer.from(s, 'binary'), 0, s.length, remote.port, remote.address);          
+        socket.send(new Buffer.from(s, 'binary'), 0, s.length, remote.port, remote.address, callback);
       },
       protocol: 'UDP',
       release : function() {}
@@ -821,7 +821,7 @@ function makeTransport(options, callback) {
     protocols.WS = makeWsTransport(options, callbackAndLog);
 
   function wrap(obj, target) {
-    return Object.create(obj, {send: {value: function(m) {
+    return Object.create(obj, {send: {value: function(m, callback) {
       if(m.method) {
         m.headers.via[0].host = options.publicAddress || options.address || options.hostname || os.hostname();
         m.headers.via[0].port = options.port || defaultPort(this.protocol);
@@ -832,7 +832,7 @@ function makeTransport(options, callback) {
         }
       }
       options.logger && options.logger.send && options.logger.send(m, target);
-      obj.send(m);
+      obj.send(m, callback);
     }}});
   }
 
@@ -844,10 +844,10 @@ function makeTransport(options, callback) {
       var flow = protocols[target.protocol.toUpperCase()].get(target, error);
       return flow && wrap(flow, target);
     },
-    send: function(target, message) {
+    send: function(target, message, callback) {
       var cn = this.open(target);
       try {
-        cn.send(message);
+        cn.send(message, callback);
       }
       finally {
         cn.release();
@@ -978,8 +978,9 @@ function makeSM() {
         state.enter.apply(this, arguments);
     },
     signal: function(s) {
-      if(state && state[s]) 
+      if(state && state[s]){
         state[Array.prototype.shift.apply(arguments)].apply(state, arguments);
+      }
     }
   };
 }
@@ -1054,9 +1055,9 @@ function createServerTransaction(transport, cleanup) {
 
   var trying = {
     message: function() { if(rs) transport(rs); },
-    send: function(m) {
+    send: function(m, callback) {
       rs = m;
-      transport(m);
+      transport(m, callback);
       if(m.status >= 200) sm.enter(completed);
     }
   }; 
@@ -1373,7 +1374,7 @@ exports.create = function(options, callback) {
     send: function(m, callback) {
       if(m.method === undefined) {
         var t = transaction.getServer(m);
-        t && t.send && t.send(m);
+        t && t.send && t.send(m, callback);
       }
       else {
         var hop = parseUri(m.uri);
