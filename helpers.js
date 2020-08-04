@@ -128,5 +128,6 @@ module.exports = {
   INVITE,
   BYE,
   authenticateHeaders,
+  createSessionIdAndVersion
 }
 

@@ -21,6 +21,7 @@
     "node": ">=0.2.2"
   },
   "dependencies": {
+    "uuid": "^8.3.0",
     "ws": "^6.1.0"
   },
   "devDependencies": {
