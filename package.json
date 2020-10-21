@@ -6,7 +6,8 @@
   "author": "Kirill Mikhailov <kirill.mikhailov@gmail.com>",
   "main": "sip",
   "scripts": {
-    "test": "./node_modules/.bin/coffee test/runtests.coffee"
+    "test": "./node_modules/.bin/coffee test/runtests.coffee",
+    "doc": "./node_modules/.bin/jsdoc -c ./config/js-doc.json "
   },
   "directories": {
     "lib": "",

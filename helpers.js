@@ -1,3 +1,7 @@
+/**
+ * Functions to facilitate the creation and answer of SIP requests.
+ * @module sip/helpers
+ */
 
 const {
   CRLF,
@@ -40,7 +44,7 @@ const makeViaHeader = (host, port) =>[ {
  * @param {*} request The request being answered
  * @param {{username: string, password: string}} credentials
  * @param {*} authParams Content of the 'www-authenticate' header from the request to authenticate
- * @returns {Object} The headers from the request object given as parameter, augmented with the authentication credentials under the 'authorization' header
+ * @returns {Object} The headers from the request object given as parameter, augmented with the authentication digest under the 'authorization' header
  */
 const authenticateHeaders = (request, credentials, authParams) => {
   const authData = getDigest( credentials, authParams, request.method, request.uri )
